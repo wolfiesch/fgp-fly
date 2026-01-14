@@ -137,7 +137,8 @@ impl FlyClient {
 
         #[derive(Deserialize)]
         struct AppsNodes {
-            nodes: Vec<AppNode>,
+            // Some apps may return null due to authorization errors
+            nodes: Vec<Option<AppNode>>,
         }
 
         #[derive(Deserialize)]
@@ -179,10 +180,12 @@ impl FlyClient {
         let variables = serde_json::json!({ "first": limit });
         let result: AppsResponse = self.query(query, Some(variables)).await?;
 
+        // Filter out unauthorized apps (null values)
         let apps = result
             .apps
             .nodes
             .into_iter()
+            .flatten() // Skip None values
             .map(|n| App {
                 id: n.id,
                 name: n.name,
