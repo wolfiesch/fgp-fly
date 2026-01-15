@@ -5,7 +5,7 @@ Fast Fly.io operations via FGP daemon. Manage apps, machines, and deployments wi
 ## Installation
 
 ```bash
-git clone https://github.com/wolfiesch/fgp-fly.git
+git clone https://github.com/fast-gateway-protocol/fly.git
 cd fgp-fly
 cargo build --release
 ```
