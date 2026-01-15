@@ -1,0 +1,34 @@
+[
+  {
+    "session_id": "10296741-0b3a-4bd0-95ec-07fc3a823bb1",
+    "transcript_path": "/Users/wolfgangschoenberger/.claude/projects/-Users-wolfgangschoenberger-Projects-fgp/10296741-0b3a-4bd0-95ec-07fc3a823bb1.jsonl",
+    "cwd": "/Users/wolfgangschoenberger/Projects/fgp/fly",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "fix neon auth credentials"
+  },
+  {
+    "session_id": "10296741-0b3a-4bd0-95ec-07fc3a823bb1",
+    "transcript_path": "/Users/wolfgangschoenberger/.claude/projects/-Users-wolfgangschoenberger-Projects-fgp/10296741-0b3a-4bd0-95ec-07fc3a823bb1.jsonl",
+    "cwd": "/Users/wolfgangschoenberger/Projects/fgp/fly",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "commit the updated benchmark script"
+  },
+  {
+    "session_id": "10296741-0b3a-4bd0-95ec-07fc3a823bb1",
+    "transcript_path": "/Users/wolfgangschoenberger/.claude/projects/-Users-wolfgangschoenberger-Projects-fgp/10296741-0b3a-4bd0-95ec-07fc3a823bb1.jsonl",
+    "cwd": "/Users/wolfgangschoenberger/Projects/fgp/fly",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "what's next for the fgp project"
+  },
+  {
+    "session_id": "10296741-0b3a-4bd0-95ec-07fc3a823bb1",
+    "transcript_path": "/Users/wolfgangschoenberger/.claude/projects/-Users-wolfgangschoenberger-Projects-fgp/10296741-0b3a-4bd0-95ec-07fc3a823bb1.jsonl",
+    "cwd": "/Users/wolfgangschoenberger/Projects/fgp/fly",
+    "permission_mode": "plan",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "focus on t0 for now, we'll move on to t1 and t2 subsequently"
+  }
+]

@@ -112,6 +112,85 @@ impl FlyService {
 
         Ok(user)
     }
+
+    /// List regions implementation.
+    fn list_regions(&self) -> Result<Value> {
+        let client = self.client.clone();
+
+        let regions = self.runtime.block_on(async move {
+            client.list_regions().await
+        })?;
+
+        Ok(regions)
+    }
+
+    /// Secrets implementation (list/set/delete).
+    fn handle_secrets(&self, params: HashMap<String, Value>) -> Result<Value> {
+        let app_name = Self::get_param_str(&params, "app")
+            .ok_or_else(|| anyhow::anyhow!("Missing required parameter: app"))?
+            .to_string();
+
+        let action = Self::get_param_str(&params, "action").unwrap_or("list");
+
+        let client = self.client.clone();
+
+        match action {
+            "list" => {
+                let result = self.runtime.block_on(async move {
+                    client.list_secrets(&app_name).await
+                })?;
+                Ok(result)
+            }
+            "set" => {
+                let key = Self::get_param_str(&params, "key")
+                    .ok_or_else(|| anyhow::anyhow!("Missing required parameter: key for action=set"))?
+                    .to_string();
+                let value = Self::get_param_str(&params, "value")
+                    .ok_or_else(|| anyhow::anyhow!("Missing required parameter: value for action=set"))?
+                    .to_string();
+
+                let result = self.runtime.block_on(async move {
+                    client.set_secret(&app_name, &key, &value).await
+                })?;
+                Ok(serde_json::json!({
+                    "set": true,
+                    "result": result
+                }))
+            }
+            "delete" => {
+                let key = Self::get_param_str(&params, "key")
+                    .ok_or_else(|| anyhow::anyhow!("Missing required parameter: key for action=delete"))?
+                    .to_string();
+
+                let result = self.runtime.block_on(async move {
+                    client.delete_secret(&app_name, &key).await
+                })?;
+                Ok(serde_json::json!({
+                    "deleted": true,
+                    "result": result
+                }))
+            }
+            _ => anyhow::bail!("Unknown action: {}. Valid actions are: list, set, delete", action),
+        }
+    }
+
+    /// Restart app implementation.
+    fn restart_app(&self, params: HashMap<String, Value>) -> Result<Value> {
+        let app_name = Self::get_param_str(&params, "app")
+            .ok_or_else(|| anyhow::anyhow!("Missing required parameter: app"))?
+            .to_string();
+
+        let client = self.client.clone();
+
+        let result = self.runtime.block_on(async move {
+            client.restart_app(&app_name).await
+        })?;
+
+        Ok(serde_json::json!({
+            "restarted": true,
+            "result": result
+        }))
+    }
 }
 
 impl FgpService for FlyService {
@@ -130,6 +209,9 @@ impl FgpService for FlyService {
             "status" | "fly.status" => self.app_status(params),
             "machines" | "fly.machines" => self.list_machines(params),
             "user" | "fly.user" => self.get_user(),
+            "regions" | "fly.regions" => self.list_regions(),
+            "secrets" | "fly.secrets" => self.handle_secrets(params),
+            "restart" | "fly.restart" => self.restart_app(params),
             _ => anyhow::bail!("Unknown method: {}", method),
         }
     }
@@ -170,6 +252,51 @@ impl FgpService for FlyService {
                 name: "fly.user".into(),
                 description: "Get current user info".into(),
                 params: vec![],
+            },
+            MethodInfo {
+                name: "fly.regions".into(),
+                description: "List all Fly.io regions".into(),
+                params: vec![],
+            },
+            MethodInfo {
+                name: "fly.secrets".into(),
+                description: "Manage secrets for an app".into(),
+                params: vec![
+                    ParamInfo {
+                        name: "app".into(),
+                        param_type: "string".into(),
+                        required: true,
+                        default: None,
+                    },
+                    ParamInfo {
+                        name: "action".into(),
+                        param_type: "string".into(),
+                        required: false,
+                        default: Some(serde_json::json!("list")),
+                    },
+                    ParamInfo {
+                        name: "key".into(),
+                        param_type: "string".into(),
+                        required: false,
+                        default: None,
+                    },
+                    ParamInfo {
+                        name: "value".into(),
+                        param_type: "string".into(),
+                        required: false,
+                        default: None,
+                    },
+                ],
+            },
+            MethodInfo {
+                name: "fly.restart".into(),
+                description: "Restart all machines for an app".into(),
+                params: vec![ParamInfo {
+                    name: "app".into(),
+                    param_type: "string".into(),
+                    required: true,
+                    default: None,
+                }],
             },
         ]
     }

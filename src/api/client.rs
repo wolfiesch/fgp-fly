@@ -341,6 +341,122 @@ impl FlyClient {
         let result: Value = self.query(query, None).await?;
         Ok(result)
     }
+
+    /// List all Fly.io regions.
+    pub async fn list_regions(&self) -> Result<Value> {
+        let query = r#"
+            query {
+                platform {
+                    regions {
+                        code
+                        name
+                        gatewayAvailable
+                    }
+                }
+            }
+        "#;
+
+        let result: Value = self.query(query, None).await?;
+        Ok(result)
+    }
+
+    /// List secrets for an app (names only, values are not exposed).
+    pub async fn list_secrets(&self, app_name: &str) -> Result<Value> {
+        let query = r#"
+            query($name: String!) {
+                app(name: $name) {
+                    secrets {
+                        name
+                        digest
+                        createdAt
+                    }
+                }
+            }
+        "#;
+
+        let variables = serde_json::json!({ "name": app_name });
+        let result: Value = self.query(query, Some(variables)).await?;
+        Ok(result)
+    }
+
+    /// Set a secret for an app.
+    pub async fn set_secret(&self, app_name: &str, key: &str, value: &str) -> Result<Value> {
+        let query = r#"
+            mutation($input: SetSecretsInput!) {
+                setSecrets(input: $input) {
+                    release {
+                        id
+                        version
+                        status
+                    }
+                }
+            }
+        "#;
+
+        let variables = serde_json::json!({
+            "input": {
+                "appId": app_name,
+                "secrets": [
+                    {
+                        "key": key,
+                        "value": value
+                    }
+                ]
+            }
+        });
+
+        let result: Value = self.query(query, Some(variables)).await?;
+        Ok(result)
+    }
+
+    /// Delete a secret from an app.
+    pub async fn delete_secret(&self, app_name: &str, key: &str) -> Result<Value> {
+        let query = r#"
+            mutation($input: UnsetSecretsInput!) {
+                unsetSecrets(input: $input) {
+                    release {
+                        id
+                        version
+                        status
+                    }
+                }
+            }
+        "#;
+
+        let variables = serde_json::json!({
+            "input": {
+                "appId": app_name,
+                "keys": [key]
+            }
+        });
+
+        let result: Value = self.query(query, Some(variables)).await?;
+        Ok(result)
+    }
+
+    /// Restart an app (restarts all machines).
+    pub async fn restart_app(&self, app_name: &str) -> Result<Value> {
+        let query = r#"
+            mutation($input: RestartAppInput!) {
+                restartApp(input: $input) {
+                    app {
+                        id
+                        name
+                        status
+                    }
+                }
+            }
+        "#;
+
+        let variables = serde_json::json!({
+            "input": {
+                "appId": app_name
+            }
+        });
+
+        let result: Value = self.query(query, Some(variables)).await?;
+        Ok(result)
+    }
 }
 
 #[derive(Serialize)]

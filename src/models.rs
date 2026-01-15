@@ -64,6 +64,7 @@ pub struct Release {
 }
 
 /// Application status response.
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppStatus {
     pub app: App,
@@ -74,6 +75,7 @@ pub struct AppStatus {
 }
 
 /// VM allocation (legacy).
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Allocation {
     pub id: String,
@@ -84,6 +86,7 @@ pub struct Allocation {
 }
 
 /// Log entry.
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LogEntry {
     pub timestamp: String,
@@ -109,5 +112,6 @@ pub struct GraphQLResponse<T> {
 pub struct GraphQLError {
     pub message: String,
     #[serde(default)]
+    #[allow(dead_code)]
     pub path: Option<Vec<serde_json::Value>>,  // Path can be strings or integers
 }

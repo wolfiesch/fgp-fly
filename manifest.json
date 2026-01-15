@@ -37,6 +37,28 @@
       "name": "fly.user",
       "description": "Get current user info",
       "params": []
+    },
+    {
+      "name": "fly.regions",
+      "description": "List all Fly.io regions",
+      "params": []
+    },
+    {
+      "name": "fly.secrets",
+      "description": "Manage secrets for an app (list/set/delete)",
+      "params": [
+        {"name": "app", "type": "string", "required": true},
+        {"name": "action", "type": "string", "required": false, "default": "list"},
+        {"name": "key", "type": "string", "required": false},
+        {"name": "value", "type": "string", "required": false}
+      ]
+    },
+    {
+      "name": "fly.restart",
+      "description": "Restart all machines for an app",
+      "params": [
+        {"name": "app", "type": "string", "required": true}
+      ]
     }
   ],
   "auth": {
