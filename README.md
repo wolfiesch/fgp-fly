@@ -68,6 +68,71 @@ Socket: `~/.fgp/services/fly/daemon.sock`
 
 FGP keeps the API connection warm, eliminating cold-start overhead.
 
+## Troubleshooting
+
+### Invalid API Token
+
+**Symptom:** Requests fail with 401 or "unauthorized"
+
+**Solutions:**
+1. Verify token is set: `echo $FLY_API_TOKEN`
+2. Check token is valid: `curl -H "Authorization: Bearer $FLY_API_TOKEN" https://api.fly.io/graphql`
+3. Generate new token at https://fly.io/user/personal_access_tokens
+
+### App Not Found
+
+**Symptom:** "App not found" error for existing app
+
+**Check:**
+1. App name is correct (case-sensitive)
+2. Token has access to the organization owning the app
+3. Try listing apps first: `fgp call fly.apps`
+
+### Rate Limiting
+
+**Symptom:** 429 errors or slow responses
+
+**Solutions:**
+1. Fly.io has rate limits on API calls
+2. Add delays between bulk operations
+3. Cache results when possible
+
+### Empty Machine List
+
+**Symptom:** `fly.machines` returns empty for deployed app
+
+**Check:**
+1. App uses Fly Machines (not Nomad/legacy)
+2. Machines exist: `fly machines list -a <app-name>`
+3. Token has correct permissions
+
+### Connection Refused
+
+**Symptom:** "Connection refused" when calling daemon
+
+**Solution:**
+```bash
+# Check daemon is running
+pgrep -f fgp-fly
+
+# Restart daemon
+./target/release/fgp-fly stop
+export FLY_API_TOKEN="fo1_xxxxx"
+./target/release/fgp-fly start
+
+# Verify socket exists
+ls ~/.fgp/services/fly/daemon.sock
+```
+
+### GraphQL Errors
+
+**Symptom:** Errors mentioning GraphQL or query failures
+
+**Check:**
+1. Fly.io API status: https://status.fly.io
+2. Token permissions (some queries need org admin)
+3. Try simpler query first: `fly.user`
+
 ## License
 
 MIT
