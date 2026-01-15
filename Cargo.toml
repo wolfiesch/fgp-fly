@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "FGP daemon for Fly.io operations via GraphQL API"
 license = "MIT"
+repository = "https://github.com/fast-gateway-protocol/fly"
 authors = ["Wolfgang Schoenberger"]
 
 [[bin]]
