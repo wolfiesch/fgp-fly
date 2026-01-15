@@ -59,9 +59,9 @@ impl FlyService {
         let limit = Self::get_param_i32(&params, "limit", 25);
         let client = self.client.clone();
 
-        let apps = self.runtime.block_on(async move {
-            client.list_apps(Some(limit)).await
-        })?;
+        let apps = self
+            .runtime
+            .block_on(async move { client.list_apps(Some(limit)).await })?;
 
         Ok(serde_json::json!({
             "apps": apps,
@@ -77,9 +77,9 @@ impl FlyService {
 
         let client = self.client.clone();
 
-        let status = self.runtime.block_on(async move {
-            client.get_app_status(&app_name).await
-        })?;
+        let status = self
+            .runtime
+            .block_on(async move { client.get_app_status(&app_name).await })?;
 
         Ok(status)
     }
@@ -92,9 +92,9 @@ impl FlyService {
 
         let client = self.client.clone();
 
-        let machines = self.runtime.block_on(async move {
-            client.list_machines(&app_name).await
-        })?;
+        let machines = self
+            .runtime
+            .block_on(async move { client.list_machines(&app_name).await })?;
 
         Ok(serde_json::json!({
             "machines": machines,
@@ -106,9 +106,9 @@ impl FlyService {
     fn get_user(&self) -> Result<Value> {
         let client = self.client.clone();
 
-        let user = self.runtime.block_on(async move {
-            client.get_user().await
-        })?;
+        let user = self
+            .runtime
+            .block_on(async move { client.get_user().await })?;
 
         Ok(user)
     }
@@ -117,9 +117,9 @@ impl FlyService {
     fn list_regions(&self) -> Result<Value> {
         let client = self.client.clone();
 
-        let regions = self.runtime.block_on(async move {
-            client.list_regions().await
-        })?;
+        let regions = self
+            .runtime
+            .block_on(async move { client.list_regions().await })?;
 
         Ok(regions)
     }
@@ -136,22 +136,26 @@ impl FlyService {
 
         match action {
             "list" => {
-                let result = self.runtime.block_on(async move {
-                    client.list_secrets(&app_name).await
-                })?;
+                let result = self
+                    .runtime
+                    .block_on(async move { client.list_secrets(&app_name).await })?;
                 Ok(result)
             }
             "set" => {
                 let key = Self::get_param_str(&params, "key")
-                    .ok_or_else(|| anyhow::anyhow!("Missing required parameter: key for action=set"))?
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing required parameter: key for action=set")
+                    })?
                     .to_string();
                 let value = Self::get_param_str(&params, "value")
-                    .ok_or_else(|| anyhow::anyhow!("Missing required parameter: value for action=set"))?
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing required parameter: value for action=set")
+                    })?
                     .to_string();
 
-                let result = self.runtime.block_on(async move {
-                    client.set_secret(&app_name, &key, &value).await
-                })?;
+                let result = self
+                    .runtime
+                    .block_on(async move { client.set_secret(&app_name, &key, &value).await })?;
                 Ok(serde_json::json!({
                     "set": true,
                     "result": result
@@ -159,18 +163,23 @@ impl FlyService {
             }
             "delete" => {
                 let key = Self::get_param_str(&params, "key")
-                    .ok_or_else(|| anyhow::anyhow!("Missing required parameter: key for action=delete"))?
+                    .ok_or_else(|| {
+                        anyhow::anyhow!("Missing required parameter: key for action=delete")
+                    })?
                     .to_string();
 
-                let result = self.runtime.block_on(async move {
-                    client.delete_secret(&app_name, &key).await
-                })?;
+                let result = self
+                    .runtime
+                    .block_on(async move { client.delete_secret(&app_name, &key).await })?;
                 Ok(serde_json::json!({
                     "deleted": true,
                     "result": result
                 }))
             }
-            _ => anyhow::bail!("Unknown action: {}. Valid actions are: list, set, delete", action),
+            _ => anyhow::bail!(
+                "Unknown action: {}. Valid actions are: list, set, delete",
+                action
+            ),
         }
     }
 
@@ -182,9 +191,9 @@ impl FlyService {
 
         let client = self.client.clone();
 
-        let result = self.runtime.block_on(async move {
-            client.restart_app(&app_name).await
-        })?;
+        let result = self
+            .runtime
+            .block_on(async move { client.restart_app(&app_name).await })?;
 
         Ok(serde_json::json!({
             "restarted": true,
@@ -333,7 +342,10 @@ impl FgpService for FlyService {
 
         match result {
             Ok(true) => {
-                checks.insert("fly_api".into(), HealthStatus::healthy_with_latency(latency));
+                checks.insert(
+                    "fly_api".into(),
+                    HealthStatus::healthy_with_latency(latency),
+                );
             }
             Ok(false) => {
                 checks.insert("fly_api".into(), HealthStatus::unhealthy("Empty viewer ID"));

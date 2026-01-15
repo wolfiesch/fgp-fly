@@ -113,5 +113,5 @@ pub struct GraphQLError {
     pub message: String,
     #[serde(default)]
     #[allow(dead_code)]
-    pub path: Option<Vec<serde_json::Value>>,  // Path can be strings or integers
+    pub path: Option<Vec<serde_json::Value>>, // Path can be strings or integers
 }

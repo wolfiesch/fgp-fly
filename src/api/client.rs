@@ -57,8 +57,13 @@ impl FlyClient {
         // Get raw text for debugging
         let text = response.text().await.context("Failed to read response")?;
 
-        let result: GraphQLResponse<T> = serde_json::from_str(&text)
-            .map_err(|e| anyhow::anyhow!("JSON parse error: {} | Raw: {}", e, &text[..text.len().min(300)]))?;
+        let result: GraphQLResponse<T> = serde_json::from_str(&text).map_err(|e| {
+            anyhow::anyhow!(
+                "JSON parse error: {} | Raw: {}",
+                e,
+                &text[..text.len().min(300)]
+            )
+        })?;
 
         // Only fail on GraphQL errors if there's no data at all
         // GraphQL allows partial results with field-level errors
@@ -71,9 +76,7 @@ impl FlyClient {
             }
         }
 
-        result
-            .data
-            .context("GraphQL response missing data field")
+        result.data.context("GraphQL response missing data field")
     }
 
     /// Check if the client can connect to Fly.io API.
